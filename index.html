@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我们的故事</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <style>
+    /* ===== 基础重置 ===== */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+      background: #0f0c29;
+      color: #f5f5f5;
+      overflow-x: hidden;
+    }
+
+    /* ===== 星光背景 ===== */
+    .stars-container {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: #fff;
+      animation: twinkle var(--dur) ease-in-out infinite alternate;
+    }
+    @keyframes twinkle {
+      0%   { opacity: 0.2; transform: scale(0.8); }
+      100% { opacity: 1;   transform: scale(1.2); }
+    }
+
+    /* ===== 飘落爱心 ===== */
+    .hearts-container {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 1;
+      overflow: hidden;
+    }
+    .falling-heart {
+      position: absolute; top: -30px;
+      font-size: 16px;
+      animation: fallDown linear infinite;
+      opacity: 0.6;
+    }
+    @keyframes fallDown {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+      100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* ===== 开场页照片墙 ===== */
+    .hero {
+      position: relative; z-index: 2;
+      height: 100vh; overflow: hidden;
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+    }
+    .hero-photo {
+      position: absolute;
+      border: 4px solid rgba(255,255,255,0.85);
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 12px rgba(255,107,157,0.15);
+      opacity: 0;
+      transform: translateY(80px) rotate(var(--rot));
+      transition: opacity 0.8s ease, transform 0.8s ease;
+      object-fit: cover;
+      z-index: 1;
+    }
+    .hero-photo.visible {
+      opacity: 1;
+      transform: translateY(0) rotate(var(--rot));
+      animation: float var(--float-dur) ease-in-out infinite alternate;
+      animation-delay: var(--float-delay);
+    }
+    @keyframes float {
+      0%   { transform: translateY(0) rotate(var(--rot)); }
+      100% { transform: translateY(-8px) rotate(var(--rot)); }
+    }
+    .hero-photo.lg    { width: 280px; height: 200px; }
+    .hero-photo.md    { width: 220px; height: 160px; }
+    .hero-photo.sm    { width: 170px; height: 125px; }
+    .hero-photo.xs    { width: 130px; height: 100px; }
+    .hero-photo.tiny  { width: 100px; height: 75px; }
+    .hero-photo.micro { width: 72px; height: 55px; }
+
+    /* 标题叠加层 */
+    .hero-overlay {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; z-index: 10;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, rgba(15,12,41,0.7) 0%, rgba(15,12,41,0.2) 60%, transparent 100%);
+    }
+    .hero-heart {
+      font-size: 80px;
+      animation: heartbeat 1.2s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(255, 107, 157, 0.6));
+      margin-bottom: 30px;
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      15%      { transform: scale(1.15); }
+      30%      { transform: scale(1); }
+      45%      { transform: scale(1.1); }
+      60%      { transform: scale(1); }
+    }
+    .hero-overlay h1 {
+      font-family: "Dancing Script", cursive;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      background: linear-gradient(135deg, #ff6b9d, #ff8a80, #ff6b9d);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 16px;
+      text-shadow: none;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+    }
+    .hero-overlay p {
+      font-size: 1.1rem; color: rgba(255,255,255,0.8);
+      letter-spacing: 4px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    }
+    .scroll-hint {
+      position: absolute; bottom: 40px;
+      animation: bounce 2s ease-in-out infinite;
+      font-size: 1.2rem; color: rgba(255,255,255,0.5);
+      z-index: 10;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(12px); }
+    }
+
+    /* ===== 时间线区域 ===== */
+    .timeline-section {
+      position: relative; z-index: 2;
+      padding: 80px 20px 120px;
+      background: linear-gradient(180deg, #0f0c29 0%, #1a1a2e 20%, #16213e 80%, #0f0c29 100%);
+    }
+    .timeline {
+      position: relative;
+      max-width: 1000px; margin: 0 auto;
+    }
+    /* 中轴线 */
+    .timeline::before {
+      content: "";
+      position: absolute; left: 50%; top: 0;
+      width: 3px; height: 100%;
+      background: linear-gradient(180deg, transparent, #ff6b9d 10%, #ff6b9d 90%, transparent);
+      transform: translateX(-50%);
+      box-shadow: 0 0 8px rgba(255,107,157,0.5), 0 0 20px rgba(255,107,157,0.2);
+    }
+    /* 滚动光球 */
+    .timeline-progress-dot {
+      position: absolute; left: 50%;
+      width: 14px; height: 14px;
+      background: radial-gradient(circle, #ff8a80, #ff6b9d);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 12px rgba(255,107,157,0.8), 0 0 30px rgba(255,107,157,0.4);
+      z-index: 5;
+      pointer-events: none;
+      transition: top 0.15s ease-out;
+    }
+    /* 节点脉冲波纹 */
+    .timeline-dot::after {
+      content: "";
+      position: absolute; top: 50%; left: 50%;
+      width: 16px; height: 16px;
+      border: 2px solid #ff6b9d;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      animation: pulse-ring 2s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0%   { width: 16px; height: 16px; opacity: 1; }
+      100% { width: 40px; height: 40px; opacity: 0; }
+    }
+    /* 轴线粒子 */
+    .timeline-particle {
+      position: absolute;
+      width: 3px; height: 3px;
+      background: #ff8a80;
+      border-radius: 50%;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: particle-twinkle 2s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 3;
+    }
+    @keyframes particle-twinkle {
+      0%   { opacity: 0.1; transform: translateX(-50%) scale(0.5); }
+      100% { opacity: 0.9; transform: translateX(-50%) scale(1.3); }
+    }
+
+    /* 时间线节点 */
+    .timeline-item {
+      position: relative;
+      width: 50%; padding: 20px 50px;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .timeline-item.visible {
+      opacity: 1; transform: translateY(0);
+    }
+    .timeline-item:nth-child(odd) {
+      left: 0; text-align: right;
+    }
+    .timeline-item:nth-child(even) {
+      left: 50%; text-align: left;
+    }
+
+    /* 圆点 */
+    .timeline-dot {
+      position: absolute; top: 36px;
+      width: 16px; height: 16px;
+      background: #ff6b9d; border: 3px solid #fff;
+      border-radius: 50%; z-index: 1;
+      box-shadow: 0 0 12px rgba(255,107,157,0.6);
+      transition: transform 0.3s;
+    }
+    .timeline-item:nth-child(odd) .timeline-dot  { right: -8px; }
+    .timeline-item:nth-child(even) .timeline-dot { left: -8px; }
+    .timeline-item:hover .timeline-dot { transform: scale(1.4); }
+
+    /* 日期 */
+    .timeline-date {
+      font-family: "Dancing Script", cursive;
+      font-size: 1.1rem; color: #ff8a80;
+      margin-bottom: 10px;
+    }
+
+    /* 卡片 */
+    .timeline-card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 107, 157, 0.15);
+      border-radius: 16px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .timeline-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 32px rgba(255, 107, 157, 0.2);
+    }
+    /* 流动渐变光效 */
+    .timeline-card::before {
+      content: "";
+      position: absolute; top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: radial-gradient(ellipse at 30% 50%, rgba(255,107,157,0.08) 0%, transparent 50%),
+                  radial-gradient(ellipse at 70% 50%, rgba(255,138,128,0.06) 0%, transparent 50%);
+      animation: card-shimmer 8s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes card-shimmer {
+      0%   { transform: translate(0, 0) rotate(0deg); }
+      50%  { transform: translate(10%, 5%) rotate(2deg); }
+      100% { transform: translate(-5%, -3%) rotate(-1deg); }
+    }
+    /* 卡片微光闪烁粒子 */
+    .timeline-card::after {
+      content: "";
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-image: radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,0.4) 0%, transparent 100%),
+                        radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,0.3) 0%, transparent 100%),
+                        radial-gradient(1px 1px at 80% 20%, rgba(255,255,255,0.35) 0%, transparent 100%),
+                        radial-gradient(1.5px 1.5px at 40% 80%, rgba(255,138,128,0.4) 0%, transparent 100%),
+                        radial-gradient(1px 1px at 10% 60%, rgba(255,255,255,0.3) 0%, transparent 100%);
+      animation: card-sparkle 4s ease-in-out infinite alternate;
+      pointer-events: none;
+      z-index: 0;
+    }
+    @keyframes card-sparkle {
+      0%   { opacity: 0.3; }
+      50%  { opacity: 0.8; }
+      100% { opacity: 0.4; }
+    }
+    /* 确保卡片内容在特效之上 */
+    .timeline-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 照片轮播 */
+    .photo-gallery {
+      position: relative; overflow: hidden;
+    }
+    .photo-gallery .slides {
+      display: flex;
+      transition: transform 0.5s ease;
+    }
+    .photo-gallery .slides img {
+      width: 100%; height: 420px;
+      object-fit: cover; flex-shrink: 0;
+      cursor: pointer;
+    }
+    .photo-gallery .slides img:hover { filter: brightness(1.1); }
+    /* 全屏按钮 */
+    .fullscreen-btn {
+      position: absolute; top: 10px; right: 10px;
+      width: 36px; height: 36px;
+      background: rgba(0,0,0,0.5); color: #fff;
+      border: none; border-radius: 8px; cursor: pointer;
+      font-size: 18px; display: flex; align-items: center;
+      justify-content: center; z-index: 3;
+      opacity: 0; transition: opacity 0.3s, background 0.3s;
+    }
+    .photo-gallery:hover .fullscreen-btn { opacity: 1; }
+    .fullscreen-btn:hover { background: rgba(255,107,157,0.9); }
+    .gallery-nav {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 32px; height: 32px;
+      background: rgba(0,0,0,0.5); color: #fff;
+      border: none; border-radius: 50%; cursor: pointer;
+      font-size: 16px; display: flex; align-items: center;
+      justify-content: center; z-index: 2;
+      transition: background 0.3s;
+    }
+    .gallery-nav:hover { background: rgba(255,107,157,0.8); }
+    .gallery-prev { left: 8px; }
+    .gallery-next { right: 8px; }
+    .gallery-dots {
+      text-align: center; padding: 8px 0;
+    }
+    .gallery-dots span {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      margin: 0 4px;
+      transition: background 0.3s;
+    }
+    .gallery-dots span.active {
+      background: #ff6b9d;
+    }
+
+    /* 卡片文字 */
+    .timeline-card-body {
+      padding: 18px 20px;
+    }
+    .timeline-card-body h3 {
+      font-size: 1.15rem; margin-bottom: 8px;
+      background: linear-gradient(90deg, #ff6b9d, #ff8a80);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .timeline-card-body p {
+      font-size: 0.92rem; line-height: 1.7;
+      color: rgba(255,255,255,0.75);
+    }
+
+    /* ===== 结尾页 ===== */
+    .ending {
+      position: relative; z-index: 2;
+      min-height: 60vh; display: flex;
+      flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      padding: 60px 20px;
+      background: linear-gradient(180deg, #0f0c29, #1a1a2e);
+    }
+    .ending-heart {
+      font-size: 60px;
+      animation: heartbeat 1.2s ease-in-out infinite;
+      margin-bottom: 30px;
+    }
+    .ending h2 {
+      font-family: "Dancing Script", cursive;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      color: #ff6b9d; margin-bottom: 16px;
+    }
+    .ending p {
+      font-size: 1rem; color: rgba(255,255,255,0.6);
+      max-width: 500px; line-height: 1.8;
+    }
+    .ending .names {
+      margin-top: 30px;
+      font-family: "Dancing Script", cursive;
+      font-size: 1.6rem;
+      color: #ff8a80;
+    }
+
+    /* ===== 灯箱 ===== */
+    .lightbox {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.9);
+      display: none; align-items: center;
+      justify-content: center; z-index: 1000;
+      cursor: pointer;
+    }
+    .lightbox.active { display: flex; }
+    .lightbox img {
+      max-width: 90%; max-height: 90vh;
+      border-radius: 12px;
+      box-shadow: 0 0 40px rgba(255,107,157,0.3);
+    }
+
+    /* ===== 音乐播放器 ===== */
+    .music-btn {
+      position: fixed; bottom: 30px; right: 30px;
+      width: 50px; height: 50px;
+      background: rgba(255,107,157,0.85);
+      border: none; border-radius: 50%;
+      color: #fff; font-size: 22px;
+      cursor: pointer; z-index: 999;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 20px rgba(255,107,157,0.4);
+      transition: transform 0.3s, background 0.3s;
+      animation: glow-pulse 2s ease-in-out infinite;
+    }
+    .music-btn:hover {
+      transform: scale(1.1);
+      background: rgba(255,107,157,1);
+    }
+    .music-btn.playing {
+      animation: glow-pulse 2s ease-in-out infinite, spin-slow 4s linear infinite;
+    }
+    @keyframes glow-pulse {
+      0%, 100% { box-shadow: 0 4px 20px rgba(255,107,157,0.4); }
+      50%      { box-shadow: 0 4px 30px rgba(255,107,157,0.7), 0 0 50px rgba(255,107,157,0.2); }
+    }
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* ===== 响应式 ===== */
+    @media (max-width: 768px) {
+      .timeline::before { left: 20px; }
+      .timeline-item {
+        width: 100%; left: 0 !important;
+        padding: 15px 15px 15px 50px;
+        text-align: left !important;
+      }
+      .timeline-dot {
+        left: 12px !important; right: auto !important;
+      }
+      .timeline-dot::after { display: none; }
+      .timeline-card img, .photo-gallery .slides img { height: 300px; }
+      .hero-heart { font-size: 60px; }
+      .hero-photo.lg    { width: 160px; height: 115px; }
+      .hero-photo.md    { width: 130px; height: 95px; }
+      .hero-photo.sm    { width: 105px; height: 78px; }
+      .hero-photo.xs    { width: 85px; height: 65px; }
+      .hero-photo.tiny  { width: 65px; height: 50px; }
+      .hero-photo.micro { width: 50px; height: 38px; }
+      .timeline-progress-dot { display: none; }
+      .music-btn { bottom: 20px; right: 20px; width: 44px; height: 44px; font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 星光背景 -->
+  <div class="stars-container" id="stars"></div>
+
+  <!-- 飘落爱心 -->
+  <div class="hearts-container" id="hearts"></div>
+
+  <!-- 开场页照片墙 -->
+  <section class="hero">
+    <!-- 第一排：顶部区域 -->
+    <img class="hero-photo lg" src="images/20241208-first-01.jpg" style="top:3%;left:2%;--rot:-8deg;--float-dur:4s;--float-delay:0s" alt="第一次">
+    <img class="hero-photo md" src="images/20250419-changqing-01.jpg" style="top:2%;left:28%;--rot:5deg;--float-dur:4.8s;--float-delay:0.4s" alt="长清">
+    <img class="hero-photo sm" src="images/20250308-wanda-02.jpg" style="top:5%;left:52%;--rot:-3deg;--float-dur:5.2s;--float-delay:0.8s" alt="万达">
+    <img class="hero-photo xs" src="images/20250520-huangtai-02.jpg" style="top:1%;right:22%;--rot:10deg;--float-dur:4.5s;--float-delay:0.2s" alt="黄台">
+    <img class="hero-photo md" src="images/20250521-olebao-01.jpg" style="top:4%;right:2%;--rot:-6deg;--float-dur:5s;--float-delay:0.6s" alt="欧乐堡">
+
+    <!-- 第二排：中上区域 -->
+    <img class="hero-photo sm" src="images/20250726-piaoliangfan-01.jpg" style="top:22%;left:1%;--rot:7deg;--float-dur:4.2s;--float-delay:1s" alt="漂亮饭">
+    <img class="hero-photo lg" src="images/20250822-nanjing-01.jpg" style="top:20%;left:18%;--rot:-5deg;--float-dur:5.5s;--float-delay:0.3s" alt="南京">
+    <img class="hero-photo tiny" src="images/20250824-hangzhou-01.jpg" style="top:25%;left:43%;--rot:12deg;--float-dur:4s;--float-delay:1.3s" alt="杭州">
+    <img class="hero-photo md" src="images/20250825-wuzhen-01.jpg" style="top:18%;right:28%;--rot:-4deg;--float-dur:4.6s;--float-delay:0.7s" alt="乌镇">
+    <img class="hero-photo xs" src="images/20250826-nanxun-01.jpg" style="top:24%;right:12%;--rot:8deg;--float-dur:5.3s;--float-delay:0.5s" alt="南浔">
+    <img class="hero-photo sm" src="images/20250827-suzhou-01.jpg" style="top:20%;right:1%;--rot:-9deg;--float-dur:4.4s;--float-delay:1.1s" alt="苏州">
+
+    <!-- 第三排：中间区域 -->
+    <img class="hero-photo xs" src="images/20251005-donga-01.jpg" style="top:42%;left:3%;--rot:6deg;--float-dur:5s;--float-delay:0.9s" alt="东阿">
+    <img class="hero-photo sm" src="images/20251007-jingsanlu-01.jpg" style="top:45%;left:22%;--rot:-11deg;--float-dur:4.3s;--float-delay:0.1s" alt="经三路">
+    <img class="hero-photo tiny" src="images/20251102-quanchengpark-01.jpg" style="top:40%;left:42%;--rot:4deg;--float-dur:5.1s;--float-delay:1.4s" alt="泉城公园">
+    <img class="hero-photo lg" src="images/20251108-anniversary-01.jpg" style="top:38%;right:25%;--rot:-7deg;--float-dur:4.7s;--float-delay:0.4s" alt="一周年">
+    <img class="hero-photo micro" src="images/20251206-datoutie-01.jpg" style="top:48%;right:14%;--rot:13deg;--float-dur:4s;--float-delay:0.8s" alt="大头贴">
+    <img class="hero-photo md" src="images/20251226-birthday-01.jpg" style="top:43%;right:1%;--rot:-3deg;--float-dur:5.4s;--float-delay:1.2s" alt="生日">
+
+    <!-- 第四排：中下区域 -->
+    <img class="hero-photo sm" src="images/20251228-xueyeski-01.jpg" style="top:62%;left:5%;--rot:9deg;--float-dur:4.5s;--float-delay:0.6s" alt="雪野滑雪">
+    <img class="hero-photo xs" src="images/20260207-billiards-01.jpg" style="top:65%;left:28%;--rot:-8deg;--float-dur:5.2s;--float-delay:1s" alt="台球厅">
+    <img class="hero-photo tiny" src="images/20260214-laozhaocun-01.jpg" style="top:60%;left:48%;--rot:5deg;--float-dur:4.1s;--float-delay:0.3s" alt="老赵村">
+    <img class="hero-photo md" src="images/20260322-baihuapark-01.jpg" style="top:63%;right:22%;--rot:-6deg;--float-dur:4.9s;--float-delay:0.7s" alt="百花公园">
+    <img class="hero-photo xs" src="images/20260329-jinanzoo-01.jpg" style="top:67%;right:5%;--rot:11deg;--float-dur:5s;--float-delay:1.5s" alt="济南动物园">
+
+    <!-- 第五排：底部区域 -->
+    <img class="hero-photo md" src="images/20260405-mishi-02.jpg" style="bottom:6%;left:8%;--rot:-4deg;--float-dur:4.8s;--float-delay:0.2s" alt="秘境石崮寨">
+    <img class="hero-photo sm" src="images/20260504-dongpinghu-01.jpg" style="bottom:3%;right:30%;--rot:7deg;--float-dur:5.3s;--float-delay:0.9s" alt="东平湖">
+    <img class="hero-photo lg" src="images/20251226-birthday-02.jpg" style="bottom:8%;right:3%;--rot:-5deg;--float-dur:4.4s;--float-delay:1.3s" alt="生日2">
+
+    <div class="hero-overlay">
+      <div class="hero-heart">❤</div>
+      <h1>Our Love Story</h1>
+      <p>我 们 的 故 事</p>
+    </div>
+    <div class="scroll-hint">↓ 向下滑动 ↓</div>
+  </section>
+
+  <!-- 时间线 -->
+  <section class="timeline-section">
+    <div class="timeline">
+      <div class="timeline-progress-dot" id="timelineDot"></div>
+
+      <!-- 2026.05.04 东平湖 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2026.05.04</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="0">
+            <div class="slides">
+              <img src="images/20260504-dongpinghu-01.jpg" alt="东平湖" onclick="openLightbox(this)">
+              <img src="images/20260504-dongpinghu-02.jpg" alt="东平湖" onclick="openLightbox(this)">
+              <img src="images/20260504-dongpinghu-03.jpg" alt="东平湖" onclick="openLightbox(this)">
+              <img src="images/20260504-dongpinghu-04.jpg" alt="东平湖" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>东平湖</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2026.04.25 华山湖公园 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2026.04.25</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="1">
+            <div class="slides">
+              <img src="images/20260425-huashanhu-01.jpg" alt="华山湖公园" onclick="openLightbox(this)">
+              <img src="images/20260425-huashanhu-02.jpg" alt="华山湖公园" onclick="openLightbox(this)">
+              <img src="images/20260425-huashanhu-03.jpg" alt="华山湖公园" onclick="openLightbox(this)">
+              <img src="images/20260425-huashanhu-04.jpg" alt="华山湖公园" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>华山湖公园</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2026.04.05 秘境石崮寨 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2026.04.05</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="2">
+            <div class="slides">
+              <img src="images/20260405-mishi-01.jpg" alt="秘境石崮寨" onclick="openLightbox(this)">
+              <img src="images/20260405-mishi-02.jpg" alt="秘境石崮寨" onclick="openLightbox(this)">
+              <img src="images/20260405-mishi-03.jpg" alt="秘境石崮寨" onclick="openLightbox(this)">
+              <img src="images/20260405-mishi-04.jpg" alt="秘境石崮寨" onclick="openLightbox(this)">
+              <img src="images/20260405-mishi-05.jpg" alt="秘境石崮寨" onclick="openLightbox(this)">
+              <img src="images/20260405-mishi-06.jpg" alt="秘境石崮寨" onclick="openLightbox(this)">
+              <img src="images/20260405-mishi-07.jpg" alt="秘境石崮寨" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>秘境石崮寨</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2026.03.29 济南动物园 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2026.03.29</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="3">
+            <div class="slides">
+              <img src="images/20260329-jinanzoo-01.jpg" alt="济南动物园" onclick="openLightbox(this)">
+              <img src="images/20260329-jinanzoo-02.jpg" alt="济南动物园" onclick="openLightbox(this)">
+              <img src="images/20260329-jinanzoo-03.jpg" alt="济南动物园" onclick="openLightbox(this)">
+              <img src="images/20260329-jinanzoo-04.jpg" alt="济南动物园" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>济南动物园</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2026.03.22 百花公园 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2026.03.22</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="4">
+            <div class="slides">
+              <img src="images/20260322-baihuapark-01.jpg" alt="百花公园" onclick="openLightbox(this)">
+              <img src="images/20260322-baihuapark-02.jpg" alt="百花公园" onclick="openLightbox(this)">
+              <img src="images/20260322-baihuapark-03.jpg" alt="百花公园" onclick="openLightbox(this)">
+              <img src="images/20260322-baihuapark-04.jpg" alt="百花公园" onclick="openLightbox(this)">
+              <img src="images/20260322-baihuapark-05.jpg" alt="百花公园" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>百花公园</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2026.02.14 老赵村 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2026.02.14</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="5">
+            <div class="slides">
+              <img src="images/20260214-laozhaocun-01.jpg" alt="老赵村" onclick="openLightbox(this)">
+              <img src="images/20260214-laozhaocun-02.jpg" alt="老赵村" onclick="openLightbox(this)">
+              <img src="images/20260214-laozhaocun-03.jpg" alt="老赵村" onclick="openLightbox(this)">
+              <img src="images/20260214-laozhaocun-04.jpg" alt="老赵村" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>老赵村</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2026.02.07 台球厅 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2026.02.07</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="6">
+            <div class="slides">
+              <img src="images/20260207-billiards-01.jpg" alt="台球厅" onclick="openLightbox(this)">
+              <img src="images/20260207-billiards-02.jpg" alt="台球厅" onclick="openLightbox(this)">
+              <img src="images/20260207-billiards-03.jpg" alt="台球厅" onclick="openLightbox(this)">
+              <img src="images/20260207-billiards-04.jpg" alt="台球厅" onclick="openLightbox(this)">
+              <img src="images/20260207-billiards-05.jpg" alt="台球厅" onclick="openLightbox(this)">
+              <img src="images/20260207-billiards-06.jpg" alt="台球厅" onclick="openLightbox(this)">
+              <img src="images/20260207-billiards-07.jpg" alt="台球厅" onclick="openLightbox(this)">
+              <img src="images/20260207-billiards-08.jpg" alt="台球厅" onclick="openLightbox(this)">
+              <img src="images/20260207-billiards-09.jpg" alt="台球厅" onclick="openLightbox(this)">
+              <img src="images/20260207-billiards-10.jpg" alt="台球厅" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>台球厅</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.12.28 雪野滑雪场 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.12.28</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="7">
+            <div class="slides">
+              <img src="images/20251228-xueyeski-01.jpg" alt="雪野滑雪场" onclick="openLightbox(this)">
+              <img src="images/20251228-xueyeski-02.jpg" alt="雪野滑雪场" onclick="openLightbox(this)">
+              <img src="images/20251228-xueyeski-03.jpg" alt="雪野滑雪场" onclick="openLightbox(this)">
+              <img src="images/20251228-xueyeski-04.jpg" alt="雪野滑雪场" onclick="openLightbox(this)">
+              <img src="images/20251228-xueyeski-05.jpg" alt="雪野滑雪场" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>雪野滑雪场</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.12.26 生日 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.12.26</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="8">
+            <div class="slides">
+              <img src="images/20251226-birthday-01.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20251226-birthday-02.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20251226-birthday-03.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20251226-birthday-04.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20251226-birthday-05.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20251226-birthday-06.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20251226-birthday-07.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20251226-birthday-08.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20251226-birthday-09.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20251226-birthday-10.jpg" alt="生日" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>生日</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.12.13 尹珍珠+山大 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.12.13</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="9">
+            <div class="slides">
+              <img src="images/20251213-yinzhenzhu-01.jpg" alt="尹珍珠+山大" onclick="openLightbox(this)">
+              <img src="images/20251213-yinzhenzhu-02.jpg" alt="尹珍珠+山大" onclick="openLightbox(this)">
+              <img src="images/20251213-yinzhenzhu-03.jpg" alt="尹珍珠+山大" onclick="openLightbox(this)">
+              <img src="images/20251213-yinzhenzhu-04.jpg" alt="尹珍珠+山大" onclick="openLightbox(this)">
+              <img src="images/20251213-yinzhenzhu-05.jpg" alt="尹珍珠+山大" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>尹珍珠+山大</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.12.06 大头贴 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.12.06</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="10">
+            <div class="slides">
+              <img src="images/20251206-datoutie-01.jpg" alt="大头贴" onclick="openLightbox(this)">
+              <img src="images/20251206-datoutie-02.jpg" alt="大头贴" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>大头贴</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.11.08 一周年 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.11.08</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="11">
+            <div class="slides">
+              <img src="images/20251108-anniversary-01.jpg" alt="一周年" onclick="openLightbox(this)">
+              <img src="images/20251108-anniversary-02.jpg" alt="一周年" onclick="openLightbox(this)">
+              <img src="images/20251108-anniversary-03.jpg" alt="一周年" onclick="openLightbox(this)">
+              <img src="images/20251108-anniversary-04.jpg" alt="一周年" onclick="openLightbox(this)">
+              <img src="images/20251108-anniversary-05.jpg" alt="一周年" onclick="openLightbox(this)">
+              <img src="images/20251108-anniversary-06.jpg" alt="一周年" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>一周年</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.11.02 泉城公园 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.11.02</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="12">
+            <div class="slides">
+              <img src="images/20251102-quanchengpark-01.jpg" alt="泉城公园" onclick="openLightbox(this)">
+              <img src="images/20251102-quanchengpark-02.jpg" alt="泉城公园" onclick="openLightbox(this)">
+              <img src="images/20251102-quanchengpark-03.jpg" alt="泉城公园" onclick="openLightbox(this)">
+              <img src="images/20251102-quanchengpark-04.jpg" alt="泉城公园" onclick="openLightbox(this)">
+              <img src="images/20251102-quanchengpark-05.jpg" alt="泉城公园" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>泉城公园</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.10.07 经三路 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.10.07</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="13">
+            <div class="slides">
+              <img src="images/20251007-jingsanlu-01.jpg" alt="经三路" onclick="openLightbox(this)">
+              <img src="images/20251007-jingsanlu-02.jpg" alt="经三路" onclick="openLightbox(this)">
+              <img src="images/20251007-jingsanlu-03.jpg" alt="经三路" onclick="openLightbox(this)">
+              <img src="images/20251007-jingsanlu-04.jpg" alt="经三路" onclick="openLightbox(this)">
+              <img src="images/20251007-jingsanlu-05.jpg" alt="经三路" onclick="openLightbox(this)">
+              <img src="images/20251007-jingsanlu-06.jpg" alt="经三路" onclick="openLightbox(this)">
+              <img src="images/20251007-jingsanlu-07.jpg" alt="经三路" onclick="openLightbox(this)">
+              <img src="images/20251007-jingsanlu-08.jpg" alt="经三路" onclick="openLightbox(this)">
+              <img src="images/20251007-jingsanlu-09.jpg" alt="经三路" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>经三路</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.10.05 东阿 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.10.05</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="14">
+            <div class="slides">
+              <img src="images/20251005-donga-01.jpg" alt="东阿" onclick="openLightbox(this)">
+              <img src="images/20251005-donga-02.jpg" alt="东阿" onclick="openLightbox(this)">
+              <img src="images/20251005-donga-03.jpg" alt="东阿" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>东阿</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.08.27 苏州 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.08.27</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="15">
+            <div class="slides">
+              <img src="images/20250827-suzhou-01.jpg" alt="苏州" onclick="openLightbox(this)">
+              <img src="images/20250827-suzhou-02.jpg" alt="苏州" onclick="openLightbox(this)">
+              <img src="images/20250827-suzhou-03.jpg" alt="苏州" onclick="openLightbox(this)">
+              <img src="images/20250827-suzhou-04.jpg" alt="苏州" onclick="openLightbox(this)">
+              <img src="images/20250827-suzhou-05.jpg" alt="苏州" onclick="openLightbox(this)">
+              <img src="images/20250827-suzhou-06.jpg" alt="苏州" onclick="openLightbox(this)">
+              <img src="images/20250827-suzhou-07.jpg" alt="苏州" onclick="openLightbox(this)">
+              <img src="images/20250827-suzhou-08.jpg" alt="苏州" onclick="openLightbox(this)">
+              <img src="images/20250827-suzhou-09.jpg" alt="苏州" onclick="openLightbox(this)">
+              <img src="images/20250827-suzhou-10.jpg" alt="苏州" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>苏州</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.08.26 南浔 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.08.26</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="16">
+            <div class="slides">
+              <img src="images/20250826-nanxun-01.jpg" alt="南浔" onclick="openLightbox(this)">
+              <img src="images/20250826-nanxun-02.jpg" alt="南浔" onclick="openLightbox(this)">
+              <img src="images/20250826-nanxun-03.jpg" alt="南浔" onclick="openLightbox(this)">
+              <img src="images/20250826-nanxun-04.jpg" alt="南浔" onclick="openLightbox(this)">
+              <img src="images/20250826-nanxun-05.jpg" alt="南浔" onclick="openLightbox(this)">
+              <img src="images/20250826-nanxun-06.jpg" alt="南浔" onclick="openLightbox(this)">
+              <img src="images/20250826-nanxun-07.jpg" alt="南浔" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>南浔</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.08.25 乌镇 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.08.25</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="17">
+            <div class="slides">
+              <img src="images/20250825-wuzhen-01.jpg" alt="乌镇" onclick="openLightbox(this)">
+              <img src="images/20250825-wuzhen-02.jpg" alt="乌镇" onclick="openLightbox(this)">
+              <img src="images/20250825-wuzhen-03.jpg" alt="乌镇" onclick="openLightbox(this)">
+              <img src="images/20250825-wuzhen-04.jpg" alt="乌镇" onclick="openLightbox(this)">
+              <img src="images/20250825-wuzhen-05.jpg" alt="乌镇" onclick="openLightbox(this)">
+              <img src="images/20250825-wuzhen-06.jpg" alt="乌镇" onclick="openLightbox(this)">
+              <img src="images/20250825-wuzhen-07.jpg" alt="乌镇" onclick="openLightbox(this)">
+              <img src="images/20250825-wuzhen-08.jpg" alt="乌镇" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>乌镇</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.08.24 杭州 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.08.24</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="18">
+            <div class="slides">
+              <img src="images/20250824-hangzhou-01.jpg" alt="杭州" onclick="openLightbox(this)">
+              <img src="images/20250824-hangzhou-02.jpg" alt="杭州" onclick="openLightbox(this)">
+              <img src="images/20250824-hangzhou-03.jpg" alt="杭州" onclick="openLightbox(this)">
+              <img src="images/20250824-hangzhou-04.jpg" alt="杭州" onclick="openLightbox(this)">
+              <img src="images/20250824-hangzhou-05.jpg" alt="杭州" onclick="openLightbox(this)">
+              <img src="images/20250824-hangzhou-06.jpg" alt="杭州" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>杭州</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.08.22 南京 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.08.22</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="19">
+            <div class="slides">
+              <img src="images/20250822-nanjing-01.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-02.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-03.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-04.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-05.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-06.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-07.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-08.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-09.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-10.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-11.jpg" alt="南京" onclick="openLightbox(this)">
+              <img src="images/20250822-nanjing-12.jpg" alt="南京" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>南京</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.07.26 漂亮饭 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.07.26</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="20">
+            <div class="slides">
+              <img src="images/20250726-piaoliangfan-01.jpg" alt="漂亮饭" onclick="openLightbox(this)">
+              <img src="images/20250726-piaoliangfan-02.jpg" alt="漂亮饭" onclick="openLightbox(this)">
+              <img src="images/20250726-piaoliangfan-03.jpg" alt="漂亮饭" onclick="openLightbox(this)">
+              <img src="images/20250726-piaoliangfan-04.jpg" alt="漂亮饭" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>漂亮饭</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.05.21 欧乐堡 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.05.21</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="21">
+            <div class="slides">
+              <img src="images/20250521-olebao-01.jpg" alt="欧乐堡" onclick="openLightbox(this)">
+              <img src="images/20250521-olebao-02.jpg" alt="欧乐堡" onclick="openLightbox(this)">
+              <img src="images/20250521-olebao-03.jpg" alt="欧乐堡" onclick="openLightbox(this)">
+              <img src="images/20250521-olebao-04.jpg" alt="欧乐堡" onclick="openLightbox(this)">
+              <img src="images/20250521-olebao-05.jpg" alt="欧乐堡" onclick="openLightbox(this)">
+              <img src="images/20250521-olebao-06.jpg" alt="欧乐堡" onclick="openLightbox(this)">
+              <img src="images/20250521-olebao-07.jpg" alt="欧乐堡" onclick="openLightbox(this)">
+              <img src="images/20250521-olebao-08.jpg" alt="欧乐堡" onclick="openLightbox(this)">
+              <img src="images/20250521-olebao-09.jpg" alt="欧乐堡" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>欧乐堡</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.05.20 黄台 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.05.20</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="22">
+            <div class="slides">
+              <img src="images/20250520-huangtai-01.jpg" alt="黄台" onclick="openLightbox(this)">
+              <img src="images/20250520-huangtai-02.jpg" alt="黄台" onclick="openLightbox(this)">
+              <img src="images/20250520-huangtai-03.jpg" alt="黄台" onclick="openLightbox(this)">
+              <img src="images/20250520-huangtai-04.jpg" alt="黄台" onclick="openLightbox(this)">
+              <img src="images/20250520-huangtai-05.jpg" alt="黄台" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>黄台</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.04.19 长清 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.04.19</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="23">
+            <div class="slides">
+              <img src="images/20250419-changqing-01.jpg" alt="长清" onclick="openLightbox(this)">
+              <img src="images/20250419-changqing-02.jpg" alt="长清" onclick="openLightbox(this)">
+              <img src="images/20250419-changqing-03.jpg" alt="长清" onclick="openLightbox(this)">
+              <img src="images/20250419-changqing-04.jpg" alt="长清" onclick="openLightbox(this)">
+              <img src="images/20250419-changqing-05.jpg" alt="长清" onclick="openLightbox(this)">
+              <img src="images/20250419-changqing-06.jpg" alt="长清" onclick="openLightbox(this)">
+              <img src="images/20250419-changqing-07.jpg" alt="长清" onclick="openLightbox(this)">
+              <img src="images/20250419-changqing-08.jpg" alt="长清" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>长清</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2025.03.08 万达 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2025.03.08</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="24">
+            <div class="slides">
+              <img src="images/20250308-wanda-01.jpg" alt="万达" onclick="openLightbox(this)">
+              <img src="images/20250308-wanda-02.jpg" alt="万达" onclick="openLightbox(this)">
+              <img src="images/20250308-wanda-03.jpg" alt="万达" onclick="openLightbox(this)">
+              <img src="images/20250308-wanda-04.jpg" alt="万达" onclick="openLightbox(this)">
+              <img src="images/20250308-wanda-05.jpg" alt="万达" onclick="openLightbox(this)">
+              <img src="images/20250308-wanda-06.jpg" alt="万达" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>万达</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2024.12.26 生日 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2024.12.26</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="25">
+            <div class="slides">
+              <img src="images/20241226-birthday-01.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20241226-birthday-02.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20241226-birthday-03.jpg" alt="生日" onclick="openLightbox(this)">
+              <img src="images/20241226-birthday-04.jpg" alt="生日" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>生日</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+      <!-- 2024.12.08 第一次 -->
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div class="timeline-date">2024.12.08</div>
+        <div class="timeline-card">
+          <div class="photo-gallery" data-gallery="26">
+            <div class="slides">
+              <img src="images/20241208-first-01.jpg" alt="第一次" onclick="openLightbox(this)">
+              <img src="images/20241208-first-02.jpg" alt="第一次" onclick="openLightbox(this)">
+              <img src="images/20241208-first-03.jpg" alt="第一次" onclick="openLightbox(this)">
+            </div>
+            <button class="gallery-nav gallery-prev" onclick="galleryNav(this,-1)">&#8249;</button>
+            <button class="gallery-nav gallery-next" onclick="galleryNav(this,1)">&#8250;</button>
+            <button class="fullscreen-btn" onclick="openFullscreen(this)">&#x26F6;</button>
+            <div class="gallery-dots"><span class="active"></span><span></span><span></span></div>
+          </div>
+          <div class="timeline-card-body">
+            <h3>第一次</h3>
+            <p><!-- 在这里填写文字内容 --></p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 结尾 -->
+  <section class="ending">
+    <div class="ending-heart">❤</div>
+    <h2>To Be Continued...</h2>
+    <p>故事还在继续，未来的每一天都值得期待。<br>感谢有你，让平凡的日子都闪闪发光。</p>
+    <div class="names">赵慧 & 姚彦轲</div>
+    <!-- ↑ 修改成你们的名字 ↑ -->
+  </section>
+
+  <!-- 灯箱 -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+
+  <!-- 背景音乐 -->
+  <audio id="bg-music" src="music/like.mp3" loop preload="auto"></audio>
+  <button class="music-btn" id="musicBtn" title="播放音乐">♪</button>
+
+  <script>
+    /* ===== 生成星光 ===== */
+    (function createStars() {
+      const container = document.getElementById("stars");
+      for (let i = 0; i < 120; i++) {
+        const star = document.createElement("div");
+        star.classList.add("star");
+        const size = Math.random() * 3 + 1;
+        star.style.width = size + "px";
+        star.style.height = size + "px";
+        star.style.left = Math.random() * 100 + "%";
+        star.style.top = Math.random() * 100 + "%";
+        star.style.setProperty("--dur", (Math.random() * 3 + 2) + "s");
+        star.style.animationDelay = Math.random() * 5 + "s";
+        container.appendChild(star);
+      }
+    })();
+
+    /* ===== 生成飘落爱心 ===== */
+    (function createHearts() {
+      const container = document.getElementById("hearts");
+      const hearts = ["❤", "💕", "♥", "💗"];
+      function spawn() {
+        const el = document.createElement("div");
+        el.classList.add("falling-heart");
+        el.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+        el.style.left = Math.random() * 100 + "%";
+        el.style.fontSize = (Math.random() * 12 + 10) + "px";
+        el.style.animationDuration = (Math.random() * 6 + 8) + "s";
+        el.style.animationDelay = Math.random() * 3 + "s";
+        container.appendChild(el);
+        setTimeout(() => el.remove(), 16000);
+      }
+      setInterval(spawn, 1500);
+      for (let i = 0; i < 5; i++) spawn();
+    })();
+
+    /* ===== 首页照片墙逐张呈现 ===== */
+    (function revealHeroPhotos() {
+      const photos = document.querySelectorAll(".hero-photo");
+      photos.forEach((photo, i) => {
+        setTimeout(() => {
+          photo.classList.add("visible");
+        }, 400 + i * 350);
+      });
+    })();
+
+    /* ===== 背景音乐播放器 ===== */
+    (function initMusic() {
+      const audio = document.getElementById("bg-music");
+      const btn = document.getElementById("musicBtn");
+      let playing = false;
+
+      function startPlay() {
+        audio.play().then(function() {
+          playing = true;
+          btn.textContent = "⏸";
+          btn.classList.add("playing");
+        }).catch(function(){});
+      }
+
+      // 尝试自动播放
+      startPlay();
+
+      // 浏览器拦截自动播放时，首次点击触发
+      const unblock = function() {
+        if (!playing) startPlay();
+        document.removeEventListener("click", unblock);
+      };
+      document.addEventListener("click", unblock);
+
+      // 按钮手动切换
+      btn.addEventListener("click", function(e) {
+        e.stopPropagation();
+        if (playing) {
+          audio.pause();
+          btn.textContent = "♪";
+          btn.classList.remove("playing");
+        } else {
+          startPlay();
+        }
+        playing = !playing;
+      });
+    })();
+
+    /* ===== 时间线滚动光球 + 轴线粒子 ===== */
+    (function initTimelineEffects() {
+      const progressDot = document.getElementById("timelineDot");
+      const timelineSection = document.querySelector(".timeline-section");
+      const timeline = document.querySelector(".timeline");
+
+      if (!progressDot || !timelineSection) return;
+
+      // 生成轴线粒子
+      for (let i = 0; i < 20; i++) {
+        const p = document.createElement("div");
+        p.classList.add("timeline-particle");
+        p.style.top = (5 + Math.random() * 90) + "%";
+        p.style.animationDelay = (Math.random() * 3) + "s";
+        p.style.animationDuration = (1.5 + Math.random() * 2) + "s";
+        timeline.appendChild(p);
+      }
+
+      // 滚动更新光球位置
+      function updateProgressDot() {
+        const rect = timelineSection.getBoundingClientRect();
+        const sectionTop = rect.top;
+        const sectionHeight = rect.height;
+        const viewH = window.innerHeight;
+
+        if (sectionTop < viewH && sectionTop + sectionHeight > 0) {
+          const progress = Math.max(0, Math.min(1, (-sectionTop + viewH * 0.3) / (sectionHeight - viewH * 0.3)));
+          progressDot.style.top = (progress * 100) + "%";
+          progressDot.style.opacity = "1";
+        } else {
+          progressDot.style.opacity = "0";
+        }
+      }
+
+      window.addEventListener("scroll", updateProgressDot, { passive: true });
+      updateProgressDot();
+    })();
+
+    /* ===== 滚动渐入动画 + 自动轮播 ===== */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const item = entry.target;
+        const gallery = item.querySelector(".photo-gallery");
+
+        if (entry.isIntersecting) {
+          item.classList.add("visible");
+
+          // 该节点进入视口，启动自动轮播
+          if (gallery && !gallery.dataset.autoPlayId) {
+            const intervalId = setInterval(function() {
+              const nextBtn = gallery.querySelector(".gallery-next");
+              if (nextBtn) galleryNav(nextBtn, 1);
+            }, 2000);
+            gallery.dataset.autoPlayId = intervalId;
+          }
+        } else {
+          // 该节点离开视口，停止自动轮播并重置
+          if (gallery && gallery.dataset.autoPlayId) {
+            clearInterval(parseInt(gallery.dataset.autoPlayId));
+            delete gallery.dataset.autoPlayId;
+            // 重置回第一张
+            const slides = gallery.querySelector(".slides");
+            const dots = gallery.querySelectorAll(".gallery-dots span");
+            gallery.dataset.index = "0";
+            if (slides) slides.style.transform = "translateX(0)";
+            dots.forEach((d, i) => d.classList.toggle("active", i === 0));
+          }
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll(".timeline-item").forEach(item => {
+      observer.observe(item);
+    });
+
+    /* ===== 灯箱 ===== */
+    function openLightbox(img) {
+      document.getElementById("lightbox-img").src = img.src;
+      document.getElementById("lightbox").classList.add("active");
+    }
+    function closeLightbox() {
+      document.getElementById("lightbox").classList.remove("active");
+    }
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeLightbox();
+    });
+
+    /* ===== 图片轮播 ===== */
+    function galleryNav(btn, dir) {
+      const gallery = btn.closest(".photo-gallery");
+      const slides = gallery.querySelector(".slides");
+      const imgs = slides.querySelectorAll("img");
+      const dots = gallery.querySelectorAll(".gallery-dots span");
+      let idx = parseInt(gallery.dataset.index || "0");
+      idx = (idx + dir + imgs.length) % imgs.length;
+      gallery.dataset.index = idx;
+      slides.style.transform = `translateX(-${idx * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle("active", i === idx));
+    }
+    function openFullscreen(btn) {
+      var g = btn.closest(".photo-gallery");
+      var imgs = g.querySelectorAll(".slides img");
+      var idx = parseInt(g.dataset.index || "0");
+      openLightbox(imgs[idx]);
+    }
+
+    /* ===== 手机滑动切换 ===== */
+    document.querySelectorAll('.photo-gallery').forEach(function(gallery) {
+      var startX = 0;
+      gallery.addEventListener('touchstart', function(e) {
+        startX = e.touches[0].clientX;
+      }, {passive: true});
+      gallery.addEventListener('touchend', function(e) {
+        var diff = startX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) {
+          var btn = gallery.querySelector(diff > 0 ? '.gallery-next' : '.gallery-prev');
+          if (btn) btn.click();
+        }
+      }, {passive: true});
+    });
+  </script>
+
+</body>
+</html>
